@@ -4,7 +4,7 @@ module Codes
 	class ItunesConnect < FastlaneCore::ItunesConnect
 
 	 # PROMO_URL = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa/LCAppPage/viewPromoCodes?adamId=[[app_id]]&platform=[[platform]]"
-	PROMO_URL = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa/LCAppPage/viewPromoCodes?adamId=[[app_id]]&versionString=latest&platform=ios"
+	PROMO_URL = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa/LCAppPage/viewPromoCodes?adamId=[[app_id]]&versionString=latest&&platform=[[platform]]"
 	CODE_URL = "https://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/redeemLandingPage?code=[[code]]"
 
 	def run(args)
@@ -13,21 +13,18 @@ module Codes
 		code_or_codes = number_of_codes == 1 ? "code" : "codes"
 		Helper.log.info "Downloading #{number_of_codes} promo #{code_or_codes}..."
 
-		p	args
-
 		app_id = args[:apple_id]
 		app_id ||= (FastlaneCore::ItunesSearchApi.fetch_by_identifier(args[:app_identifier])['trackId'] rescue nil)
-		p  app_id
 
 		app_identifier = args[:app_identifier]
-		p  app_identifier
 
 			if app_id.to_i == 0 or app_identifier.to_s.length == 0
 				raise "Could not find app using the following information: #{args}. Maybe the app is not in the store. Pass the Apple ID of the app as well!".red
 			end
 
 		app = FastlaneCore::ItunesSearchApi.fetch(app_id)
-		platform = "ios"
+		platform = args[:platform]
+		Helper.log.info "platform using is #{platform}"
 
 		# Use Pathname because it correctly handles the distinction between relative paths vs. absolute paths
 		output_file_path = Pathname.new(args[:output_file_path]) if args[:output_file_path]
