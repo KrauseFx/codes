@@ -3,8 +3,7 @@ require 'fastlane_core/itunes_connect/itunes_connect'
 module Codes
 	class ItunesConnect < FastlaneCore::ItunesConnect
 
-	 # PROMO_URL = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa/LCAppPage/viewPromoCodes?adamId=[[app_id]]&platform=[[platform]]"
-	PROMO_URL = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa/LCAppPage/viewPromoCodes?adamId=[[app_id]]&versionString=latest&&platform=[[platform]]"
+	PROMO_URL = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa/LCAppPage/viewPromoCodes?adamId=[[app_id]]&versionString=latest&platform=[[platform]]"
 	CODE_URL = "https://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/redeemLandingPage?code=[[code]]"
 
 	def run(args)
@@ -24,7 +23,7 @@ module Codes
 
 		app = FastlaneCore::ItunesSearchApi.fetch(app_id)
 		platform = args[:platform]
-		Helper.log.info "platform using is #{platform}"
+		Helper.log.info "platform using is '#{platform}'"
 
 		# Use Pathname because it correctly handles the distinction between relative paths vs. absolute paths
 		output_file_path = Pathname.new(args[:output_file_path]) if args[:output_file_path]
