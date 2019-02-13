@@ -22,12 +22,8 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'fastlane_core', '>= 0.16.0', '< 1.0.0' # all shared code and dependencies
-
-  # Frontend Scripting
-  spec.add_dependency 'phantomjs', '~> 1.9.8' # dependency for poltergeist
-  spec.add_dependency 'capybara', '~> 2.4.3' # for controlling iTC
-  spec.add_dependency 'poltergeist', '~> 1.5.1' # headless Javascript browser for controlling iTC
+  spec.add_dependency 'spaceship', '>= 0.23.0', '< 1.0.0' # all shared code and dependencies
+  spec.add_dependency 'fastlane_core', '>= 0.37.0', '< 1.0.0' # all shared code and dependencies
 
   # Development only
   spec.add_development_dependency 'bundler'

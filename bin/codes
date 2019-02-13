@@ -1,16 +1,13 @@
 #!/usr/bin/env ruby
-
 $:.push File.expand_path('../../lib', __FILE__)
 
-# require 'codes'
-# require 'commander'
-# require 'credentials_manager/appfile_config'
+require 'codes'
+require 'commander'
+require 'credentials_manager/appfile_config'
+require 'credentials_manager/appfile_config'
 require 'fastlane_core'
 
 # HighLine.track_eof = false
-
-puts "This tool is currently not working due to the new iTunes Connect interface".red
-raise "Error"
 
 class CodesApplication
   include Commander::Methods
@@ -27,13 +24,13 @@ class CodesApplication
       c.description = 'Download [num] new promo codes from iTunes Connect'
 
       c.action do |args, options|
-        username options
+        username = username(options)
         number_of_codes = count(args)
         apple_id = apple_id(options)
-        app_identifier = bundle_id(options, apple_id)
+        app_identifier = bundle_id(options)
         format = download_format options
 
-        Codes::CodesRunner.download(number_of_codes: number_of_codes, app_identifier: app_identifier, apple_id: apple_id, output_file_path: options.output_file, format: format, country: options.country)
+        Codes::CodesRunner.download(username: username, number_of_codes: number_of_codes, app_identifier: app_identifier, apple_id: apple_id, output_file_path: options.output_file, format: format)
       end
     end
 
@@ -42,11 +39,11 @@ class CodesApplication
       c.description = 'Display remaining number of promo codes from iTunes Connect'
 
       c.action do |args, options|
-        username options
+        username = username(options)
         apple_id = apple_id(options)
         app_identifier = bundle_id(options, apple_id)
 
-        Codes::CodesRunner.display(app_identifier: app_identifier, apple_id: apple_id, output_file_path: options.output_file, country: options.country)
+        Codes::CodesRunner.display(username: username, app_identifier: app_identifier, apple_id: apple_id, output_file_path: options.output_file_path)
       end
     end
     default_command :download
@@ -84,8 +81,7 @@ class CodesApplication
     user = options.username
     user ||= ENV['CODES_USERNAME']
     user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
-
-    CredentialsManager::PasswordManager.shared_manager(user) if user
+    user = CredentialsManager::AccountManager.user unless user
 
     user
   end
@@ -100,21 +96,18 @@ class CodesApplication
     format
   end
 
-  def bundle_id(options, apple_id)
+  def bundle_id(options)
     app_identifier = options.app_identifier
-    app_identifier ||= ENV['CODES_APP_IDENTIFIER']
-    app_identifier ||= CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
-    app_identifier ||= (FastlaneCore::ItunesSearchApi.fetch(apple_id)['bundleId'] rescue nil) if apple_id
-    app_identifier ||= ask('App Identifier (Bundle ID, e.g. com.krausefx.app): ')
-    app_identifier
+    app_identifier || ENV['CODES_APP_IDENTIFIER']
   end
 
   def apple_id(options)
     apple_id = options.apple_id
-    apple_id ||= ENV['CODES_APP_ID']
-    apple_id
+    apple_id || ENV['CODES_APP_ID']
   end
 end
+
+UI = FastlaneCore::UI
 
 begin
   FastlaneCore::UpdateChecker.start_looking_for_update('codes')
